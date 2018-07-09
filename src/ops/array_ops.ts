@@ -15,44 +15,34 @@
  * =============================================================================
  */
 
-import {DataType, Scalar, Tensor2D} from '@tensorflow/tfjs-core';
-import {TFEOpAttr, TFJSBinding} from '../tfjs_binding';
+import * as tfc from '@tensorflow/tfjs-core';
+import {BaseOpProgram} from './ops_base';
 
-class BaseThing {
-  constructor(protected binding: TFJSBinding) {}
+// import {DataType, Scalar, Tensor2D} from '@tensorflow/tfjs-core';
+// import {TFEOpAttr, TFJSBinding} from '../tfjs_binding';
 
-  protected createTypeOpAttr(attrName: string, dtype: DataType): TFEOpAttr {
-    return {
-      name: attrName,
-      type: this.binding.TF_ATTR_TYPE,
-      value: this.getTFDType(dtype)
-    };
-  }
+// export class ConcatV2 extends BaseThing {
+//   constructor(
+//       protected binding: TFJSBinding, protected a: Tensor2D,
+//       protected b: Tensor2D, protected axis: Scalar) {
+//     super(binding);
 
-  protected getTFDType(dataType: DataType): number {
-    switch (dataType) {
-      case 'float32':
-        return this.binding.TF_FLOAT;
-      case 'int32':
-        return this.binding.TF_INT32;
-      case 'bool':
-        return this.binding.TF_BOOL;
-      default:
-        throw new Error('Unknown dtype `${dtype}`');
-    }
-  }
-}
+//     const opAttrs = [
+//       {name: 'N', type: this.binding.TF_ATTR_INT, value: 2},
+//       this.createTypeOpAttr('Tidx', 'int32'),
+//       this.createTypeOpAttr('T', a.dtype)
+//     ];
+//   }
+// }
 
-export class ConcatV2 extends BaseThing {
-  constructor(
-      protected binding: TFJSBinding, protected a: Tensor2D,
-      protected b: Tensor2D, protected axis: Scalar) {
-    super(binding);
+export class ConcatV2OpProgram extends BaseOpProgram {
+  constructor(values: tfc.Tensor, axis: tfc.Tensor) {
+    super('ConcatV2');
 
-    const opAttrs = [
-      {name: 'N', type: this.binding.TF_ATTR_INT, value: 2},
-      this.createTypeOpAttr('Tidx', 'int32'),
-      this.createTypeOpAttr('T', a.dtype)
-    ];
+    this.addInput(values);
+    this.addInput(axis);
+
+    // this.addOpAttr({name: 'N', type: this.backend.bind})
+    // TODO add op attrs here?
   }
 }
