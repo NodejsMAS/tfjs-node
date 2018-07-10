@@ -46,3 +46,7 @@ export class ConcatV2OpProgram extends BaseOpProgram {
     // TODO add op attrs here?
   }
 }
+
+export function concat_v2(values: tfc.Tensor, axis: tfc.Tensor): tfc.Tensor {
+  return null;
+}
