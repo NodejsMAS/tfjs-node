@@ -58,6 +58,11 @@ class TFJSBackend {
                        napi_value op_attr_inputs, napi_value input_tensor_ids,
                        napi_value num_output_values);
 
+  // TODO(kreeger): Document me.
+  napi_value ExecuteOpFastPath(napi_env env, napi_value op_name_value,
+                               napi_value input_tensor_ids,
+                               napi_value num_output_values);
+
  private:
   int32_t InsertHandle(TFE_TensorHandle* tfe_handle);
 

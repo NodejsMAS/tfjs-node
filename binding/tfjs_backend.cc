@@ -19,6 +19,7 @@
 #include "tfe_auto_op.h"
 #include "tfe_utils.h"
 #include "utils.h"
+#include "../deps/tensorflow/include/tensorflow/c/c_api.h"
 
 namespace tfnodejs {
 
@@ -247,6 +248,36 @@ napi_value TFJSBackend::ExecuteOp(napi_env env, napi_value op_name_value,
     nstatus = napi_set_element(env, output_tensor_infos, i, tensor_info_value);
     ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
   }
+
+  return output_tensor_infos;
+}
+
+napi_value TFJSBackend::ExecuteOpFastPath(napi_env env,
+                                          napi_value op_name_value,
+                                          napi_value input_tensor_ids,
+                                          napi_value num_output_values) {
+  napi_status nstatus;
+  TF_AutoStatus tf_status;
+
+  char op_name[NAPI_STRING_SIZE];
+  nstatus = napi_get_value_string_utf8(env, op_name_value, op_name,
+                                       NAPI_STRING_SIZE, nullptr);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  // Crack open and look at the op registry.
+  TF_Buffer* op_list_buffer = TF_GetAllOpList();
+  TF_ApiDefMap* api_def_map = TF_NewApiDefMap(op_list_buffer, tf_status.status);
+  ENSURE_TF_OK_RETVAL(env, tf_status, nullptr);
+
+  // // tensorflow::ApiDef api_def;
+  // tensorflow::ApiDef api_def;
+  // api_def.ParseFromArray(api_def_buffer->data, api_def_buffer->length);
+  // fprintf(stderr, "apidef.name: %s\n", api_def.graph_op_name.c_str());
+
+  // For a test - don't return anything.
+  napi_value output_tensor_infos;
+  nstatus = napi_create_array_with_length(env, 0, &output_tensor_infos);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
 
   return output_tensor_infos;
 }

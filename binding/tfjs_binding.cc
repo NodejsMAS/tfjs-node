@@ -123,6 +123,25 @@ static napi_value ExecuteOp(napi_env env, napi_callback_info info) {
   return gBackend->ExecuteOp(env, args[0], args[1], args[2], args[3]);
 }
 
+static napi_value ExecuteOpFastPath(napi_env env, napi_callback_info info) {
+  napi_status nstatus;
+
+  size_t argc = 3;
+  napi_value args[argc];
+  napi_value js_this;
+  nstatus = napi_get_cb_info(env, info, &argc, args, &js_this, nullptr);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  if (argc < 3) {
+    NAPI_THROW_ERROR(env, "Invalid number of args passed to executeOp()");
+    return nullptr;
+  }
+
+  ENSURE_VALUE_IS_STRING_RETVAL(env, args[0], nullptr);
+  ENSURE_VALUE_IS_ARRAY_RETVAL(env, args[1], nullptr);
+  ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[2], nullptr);
+}
+
 static napi_value InitTFNodeJSBinding(napi_env env, napi_value exports) {
   napi_status nstatus;
 
